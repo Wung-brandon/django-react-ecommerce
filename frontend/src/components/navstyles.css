@@ -1,0 +1,19 @@
+.loginStyle{
+    text-decoration: 'none';
+    padding: '8px';
+    cursor: 'pointer';
+    border-radius: '5px';
+    color: 'white';
+    background-color: '#313638';
+    font-size: '1.2rem';
+}
+.loginStyle:hover{
+    background-color: "#ef6461";
+    color: white;
+    border: "1px solid #e8e9eb";
+    transition: "0.3s all ease"
+}
+
+li a.active{
+    color: black;
+}

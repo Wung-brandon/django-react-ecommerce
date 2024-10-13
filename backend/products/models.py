@@ -3,7 +3,8 @@ from django.utils.text import slugify
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta, datetime
+
 
 
 class Category(models.Model):
@@ -11,6 +12,7 @@ class Category(models.Model):
         ('MEN', 'Men'),
         ('WOMEN', 'Women'),
         ('CHILDREN', 'Children'),
+        ('ACCESSORIES', 'Accessories')
         
     )
     name = models.CharField(max_length=100, choices=Categories, default='MEN')
@@ -59,6 +61,15 @@ class Brand(models.Model):
         verbose_name_plural = 'Brand'
 
 class Product(models.Model):
+    DEFAULT_SIZES = (
+        ('S', 'S'),
+        ('M', 'M'),
+        ('L', 'L'),
+        ('XL', 'XL'),
+        ('XS', 'XS'),
+        ('XXL', 'XXL'),
+        ('3XL', '3XL')
+    )
     name = models.CharField(max_length=150)
     description = models.TextField(blank=True, null=True)
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, blank=True, null=True, related_name='products')
@@ -66,6 +77,8 @@ class Product(models.Model):
     subcategory = models.ForeignKey(SubCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name='products')
     price = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.PositiveIntegerField(default=0)
+    size = models.CharField(max_length=100, choices=DEFAULT_SIZES, default='M', blank=True, null=True)
+    sales_count = models.PositiveIntegerField(default=0, blank=True, null=True)
     slug = models.SlugField(max_length=150, null=True, blank=True, default=None)
     image = models.ImageField(upload_to="products/", default='', null=True, blank=True)
     video = models.FileField(upload_to='videos/', null=True, blank=True)
@@ -123,24 +136,75 @@ class ProductImage(models.Model):
         
 class Review(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="reviews")
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=150, blank=True, null=True)
     rating = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])  # Rating between 1 and 5
     review = models.TextField(blank=True, null=True)  # Optional review text
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        unique_together = ('user', 'product')  # Ensures a user can only review a product once
 
     def __str__(self):
-        return f'{self.user} review for {self.product} - Rating: {self.rating}'
+        return f'{self.name} review for {self.product} - Rating: {self.rating}'
 
 class Cart(models.Model):
-    pass
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='carts', null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f'Cart {self.id} - User: {self.user.username}'
+    
+    
+    @property
+    def total_price(self):
+        """Calculate total price of all items in the cart."""
+        return sum(item.total_price for item in self.items.all())
+
+    @property
+    def total_items(self):
+        """Get total count of items in the cart."""
+        return sum(item.quantity for item in self.items.all())
+    
+    @property
+    def total_items_count(self):
+        """Get total count of unique items in the cart."""
+        return self.items.count()  # Count of unique CartItems
+    
+        
 
 class CartItem(models.Model):
-    pass
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='cart_items')
+    quantity = models.PositiveIntegerField(default=1)
+    
+    class Meta:
+        unique_together = ('cart', 'product')  # Ensures a user can't add the same product to the cart more than once
+    
+    def __str__(self):
+        return f'Cart Item - Product: {self.product.name}, Quantity: {self.quantity}'
+    @property
+    def total_price(self):
+        """Calculate total price for this cart item based on the quantity"""
+        return self.quantity * self.product.price
 
+# Wishlist model to store wishlist related to a user
 class Wishlist(models.Model):
-    pass
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='wishlists', null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"Wishlist {self.id} - User: {self.user.username}"
+
+    @property
+    def total_items(self):
+        """Get total count of items in the wishlist."""
+        return self.wishlist_items.count()
+
+# WishlistItem model to store individual items in the wishlist
+class WishlistItem(models.Model):
+    wishlist = models.ForeignKey(Wishlist, on_delete=models.CASCADE, related_name='wishlist_items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='wishlist_items')
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('wishlist', 'product')  # Ensure that the same product is not added twice
+
+    def __str__(self):
+        return f"{self.product.name} (Wishlist: {self.wishlist.id})"

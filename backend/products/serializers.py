@@ -132,8 +132,8 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ['id', 'product', 'username', 'rating', 'review']
-        read_only_fields = ['id', 'username', 'product']
+        fields = ['id', 'product', 'name', 'rating', 'review']
+        read_only_fields = ['id', 'name', 'product']
     
 class CartItemSerializer(serializers.ModelSerializer):
     product = serializers.StringRelatedField()

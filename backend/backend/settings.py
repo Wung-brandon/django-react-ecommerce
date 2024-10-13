@@ -45,8 +45,7 @@ INSTALLED_APPS = [
     # Installed apps
     'accounts.apps.AccountsConfig',
     'products.apps.ProductsConfig',
-    
-    
+    'order.apps.OrderConfig',
     # third party apps
     'rest_framework',
     'corsheaders',

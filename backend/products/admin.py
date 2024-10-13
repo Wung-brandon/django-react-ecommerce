@@ -5,7 +5,11 @@ from .models import (
     Brand,
     Category,
     SubCategory,
-    Review
+    Review,
+    Cart,
+    CartItem,
+    Wishlist,
+    WishlistItem
 )
 
 class ProductImageAdmin(admin.ModelAdmin):
@@ -25,12 +29,30 @@ class SubCategoryAdmin(admin.ModelAdmin):
     list_display = ['name', 'category', 'slug']
 
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = ['user', 'product', 'rating']
-
+    list_display = ['name', 'product', 'rating']
+    
+class CartAdmin(admin.ModelAdmin):
+    list_display = ['user', 'created']
+    
+class CartItemAdmin(admin.ModelAdmin):
+    list_display = ['cart', 'product', 'quantity']
+    
+class WishlistAdmin(admin.ModelAdmin):
+    list_display = ['user', 'created']        
+class WishlistItemAdmin(admin.ModelAdmin):
+    list_display = ['wishlist', 'product', 'added_at'] 
+    
+    
+    
 admin.site.register(ProductImage, ProductImageAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Brand, BrandAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(SubCategory, SubCategoryAdmin)
 admin.site.register(Review, ReviewAdmin)
+
+admin.site.register(Cart, CartAdmin)
+admin.site.register(CartItem, CartItemAdmin)
+admin.site.register(Wishlist, WishlistAdmin)
+admin.site.register(WishlistItem, WishlistItemAdmin)
 # Register your models here.

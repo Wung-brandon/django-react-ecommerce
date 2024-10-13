@@ -19,15 +19,19 @@ from .views import (
     CartViews,
     CartDetailViews,
     CartItemsViews,
-    # CartItemDetailViews
+    CartItemUpdateDeleteView,
+    CartItemDetailViews,
     
     # Wishlist views
     WishlistViews,
     WishlistDetailViews,
     WishlistItemsViews,
-    # WishlistItemDetailViews
+    WishlistItemDetailViews,
     
-   
+    # WishlistItem views
+    WishlistItemsView,
+    WishlistItemUpdateDeleteView,
+    
 )
 
 
@@ -59,12 +63,18 @@ urlpatterns = [
     # Cart api endpoints
     path('cart/', CartViews.as_view(), name='cart'),
     path('cart/<int:id>/', CartDetailViews.as_view(), name='cart-detail'),
-    path('cart-item/<int:cart_id>/', CartItemsViews.as_view(), name='cart-item'),
-    # path('cart-item/<int:id>/', CartItemDetailViews.as_view(), name='cart-item'),
+    path('cart-item/user/<int:cart_id>/', CartItemsViews.as_view(), name='cart-item-user'), 
+    path('cart-item/<int:cart_id>/product/<int:product_id>/', CartItemUpdateDeleteView.as_view(), name='cart-item-update-delete'),  # PUT and DELETE
+    path('cart-item/<int:id>/', CartItemDetailViews.as_view(), name='cart-item'),
     
     # Wishlist api endpoints
     path('wishlist/', WishlistViews.as_view(), name='wishlist'),
     path('wishlist/<int:id>/', WishlistDetailViews.as_view(), name='wishlist-detail'),
-    path('wishlist-item/<int:wishlist_id>/', WishlistItemsViews.as_view(), name='wishlist-item'),
-    # path('cart-item/<int:id>/', WishlistDetailItemViews.as_view(), name='cart-item'),
+    path('wishlist-item/user/<int:wishlist_id>/', WishlistItemsViews.as_view(), name='wishlist-item-user'),
+    path('wishlist-item/<int:id>/', WishlistItemDetailViews.as_view(), name='wishlist-item'),
+    
+    # Wishlist URLs
+    path('wishlist/<int:user_id>/', WishlistItemsView.as_view(), name='wishlist-items'),  # GET and POST
+    path('wishlist/<int:user_id>/product/<int:product_id>/', WishlistItemUpdateDeleteView.as_view(), name='wishlist-item-update-delete'),  # DELETE
+    path('wishlist/<int:user_id>/delete_all/', WishlistItemUpdateDeleteView.as_view(), name='wishlist-delete-all'),  # DELETE all items
 ] 

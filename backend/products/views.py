@@ -1,4 +1,4 @@
-from rest_framework import generics
+from rest_framework import generics, status
 from django.shortcuts import get_object_or_404
 from rest_framework.parsers import FormParser, MultiPartParser
 from django.db import models
@@ -7,6 +7,8 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.exceptions import ValidationError
 from .filters import ProductFilter
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from .pagination import ProductPagination
 from .models import (
     Product,
@@ -32,7 +34,8 @@ from .serializers import (
     CartSerializer,
     CartItemSerializer,
     WishlistSerializer,
-    WishlistItemSerializer
+    WishlistItemSerializer,
+
 )
 
 
@@ -215,14 +218,103 @@ class CartDetailViews(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CartSerializer
     lookup_field = 'id'
     permission_classes = [AllowAny]  
-class CartItemsViews(generics.ListCreateAPIView):
-    queryset = CartItem.objects.all()
-    serializer_class = CartItemSerializer
-    permission_classes = [AllowAny]
     
-    def get_queryset(self):
-        cart_id = self.kwargs['cart_id']
-        return CartItem.objects.filter(cart_id=cart_id)
+    
+class CartItemsViews(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, cart_id):
+        """
+        Retrieve all items in the cart and calculate the grand total.
+        """
+        cart_items = CartItem.objects.filter(cart_id=cart_id)  # Retrieve all items for the given cart
+        serializer = CartItemSerializer(cart_items, many=True)  # Serialize the cart items
+
+        # Calculate grand total by summing the total prices of all items
+        grand_total = sum([item.product.price * item.quantity for item in cart_items])
+
+        # Return the cart items along with the grand total in the response
+        return Response({
+            "cart_items": serializer.data,  # Cart items
+            "grand_total": grand_total      # Grand total sum
+        })
+    
+    def post(self, request, cart_id):
+        """
+        Add a new cart item or update quantity if the item already exists.
+        """
+        cart = Cart.objects.get(id=cart_id)  # Get the cart instance by cart_id
+        product_id = request.data.get('product_id')  # Get the product_id from the request data
+        quantity = request.data.get('quantity')  # Get the quantity from the request data
+
+        if not product_id or not quantity:
+            return Response({'error': 'Product and quantity are required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            product = Product.objects.get(id=product_id)  # Get the product instance by product_id
+        except Product.DoesNotExist:
+            return Response({'error': 'Product not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            # Check if the product already exists in the cart
+            cart_item = CartItem.objects.get(cart=cart, product=product)
+            # If it exists, update the quantity (add to existing quantity)
+            cart_item.quantity += int(quantity)
+            cart_item.save()
+        except CartItem.DoesNotExist:
+            # If it doesn't exist, create a new CartItem
+            cart_item = CartItem.objects.create(cart=cart, product=product, quantity=quantity)
+
+        # Serialize the updated or new CartItem and return the response
+        serializer = CartItemSerializer(cart_item)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class CartItemUpdateDeleteView(APIView):
+    permission_classes = [AllowAny]
+
+    def put(self, request, cart_id, product_id):
+        """
+        Update the quantity of an existing item in the cart.
+        """
+        cart = Cart.objects.get(id=cart_id)
+        try:
+            cart_item = CartItem.objects.get(cart=cart, product_id=product_id)
+        except CartItem.DoesNotExist:
+            return Response({'error': 'Cart item not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Update quantity
+        new_quantity = request.data.get('quantity')
+        if new_quantity:
+            cart_item.quantity = new_quantity
+            cart_item.save()
+
+        serializer = CartItemSerializer(cart_item)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def delete(self, request, cart_id, product_id=None):
+        """
+        Delete a cart item or the entire cart.
+        """
+        try:
+            cart = Cart.objects.get(id=cart_id)
+        except Cart.DoesNotExist:
+            return Response({'error': 'Cart not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        if product_id:
+            # If product_id is provided, delete the specific cart item
+            try:
+                cart_item = CartItem.objects.get(cart=cart, product_id=product_id)
+                cart_item.delete()
+                return Response({'message': 'Cart item deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+            except CartItem.DoesNotExist:
+                return Response({'error': 'Cart item not found.'}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            # Delete all items in the cart
+            cart.cartitem_set.all().delete()  # Deletes all items associated with the cart
+            cart.delete()  # Optionally, delete the cart itself
+            return Response({'message': 'Cart deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+        
         
 class CartItemDetailViews(generics.RetrieveUpdateDestroyAPIView):
     queryset = CartItem.objects.all()
@@ -261,3 +353,56 @@ class WishlistItemDetailViews(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = WishlistItemSerializer
     lookup_field = 'id'
     permission_classes = [AllowAny]
+    
+    
+class WishlistItemsView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, user_id):
+        """
+        Retrieve all items in the wishlist.
+        """
+        wishlist_items = WishlistItem.objects.filter(user_id=user_id)  # Retrieve all items for the given user
+        serializer = WishlistItemSerializer(wishlist_items, many=True)  # Serialize the wishlist items
+        return Response(serializer.data)
+
+    def post(self, request, user_id):
+        """
+        Add a new item to the wishlist.
+        """
+        product_id = request.data.get('product_id')  # Get the product_id from the request data
+
+        if not product_id:
+            return Response({'error': 'Product ID is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            product = Product.objects.get(id=product_id)  # Get the product instance by product_id
+        except Product.DoesNotExist:
+            return Response({'error': 'Product not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Create a new WishlistItem
+        wishlist_item = WishlistItem.objects.create(user_id=user_id, product=product)
+        serializer = WishlistItemSerializer(wishlist_item)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class WishlistItemUpdateDeleteView(APIView):
+    permission_classes = [AllowAny]
+
+    def delete(self, request, user_id, product_id):
+        """
+        Remove an item from the wishlist.
+        """
+        try:
+            wishlist_item = WishlistItem.objects.get(user_id=user_id, product_id=product_id)
+            wishlist_item.delete()
+            return Response({'message': 'Wishlist item deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+        except WishlistItem.DoesNotExist:
+            return Response({'error': 'Wishlist item not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    def delete_all(self, request, user_id):
+        """
+        Delete all items in the wishlist.
+        """
+        WishlistItem.objects.filter(user_id=user_id).delete()  # Deletes all items in the user's wishlist
+        return Response({'message': 'All wishlist items deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)

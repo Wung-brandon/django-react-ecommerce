@@ -15,6 +15,7 @@ from .views import (
     BestSellingProductsView,
     ProductListByCategoryView, 
     ProductListBySubCategoryView,
+    ProductListByBrandView,
     # Cart views
     CartViews,
     CartDetailViews,
@@ -56,6 +57,9 @@ urlpatterns = [
     
     # Endpoint for category collections (Men, Women, Children)
     path('category/<str:category_name>/', ProductListByCategoryView.as_view(), name='product-list-by-category'),
+    
+    # Endpoint for products with brand collections (olev, Calvin klein)
+    path('brand/<str:brand_name>/', ProductListByBrandView.as_view(), name='product-list-by-brand'),
     
     # Endpoint for subcategory collections (e.g., 'watches')
     path('subcategory/<str:subcategory_name>/', ProductListBySubCategoryView.as_view(), name='product-list-by-subcategory'),

@@ -152,11 +152,7 @@ class CartItemSerializer(serializers.ModelSerializer):
     def get_unit_price(self, obj):
         """Retrieve the unit price of the product"""
         return obj.product.price
-    def get_grand_total(self, obj):
-        pass
-    
         
-
 class CartSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField() # Display
     total_price = serializers.SerializerMethodField(read_only=True) # Display

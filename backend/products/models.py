@@ -16,10 +16,11 @@ class Category(models.Model):
         
     )
     name = models.CharField(max_length=100, choices=Categories, default='MEN')
-    slug = models.SlugField(max_length=100, null=True, blank=True, default=None)
+    slug = models.SlugField(max_length=100, blank=True, unique=True)
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
+        if not self.slug:
+            self.slug = slugify(self.name)
         super(Category, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -33,10 +34,11 @@ class Category(models.Model):
 class SubCategory(models.Model):
     name = models.CharField(max_length=100)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='subcategories')
-    slug = models.SlugField(max_length=100, null=True, blank=True, default=None)
+    slug = models.SlugField(max_length=100, unique=True, blank=True)
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
+        if not self.slug:
+            self.slug = slugify(self.name)
         super(SubCategory, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -48,10 +50,11 @@ class SubCategory(models.Model):
 
 class Brand(models.Model):
     name = models.CharField(max_length=100)
-    slug = models.SlugField(max_length=100, null=True, blank=True, default=None)
+    slug = models.SlugField(max_length=100, unique=True, blank=True)
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
+        if not self.slug:
+            self.slug = slugify(self.name)
         super(Brand, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -79,7 +82,7 @@ class Product(models.Model):
     stock = models.PositiveIntegerField(default=0)
     size = models.CharField(max_length=100, choices=DEFAULT_SIZES, default='M', blank=True, null=True)
     sales_count = models.PositiveIntegerField(default=0, blank=True, null=True)
-    slug = models.SlugField(max_length=150, null=True, blank=True, default=None)
+    slug = models.SlugField(max_length=150, blank=True, unique=True)
     image = models.ImageField(upload_to="products/", default='', null=True, blank=True)
     video = models.FileField(upload_to='videos/', null=True, blank=True)
     is_featured = models.BooleanField(default=False)
@@ -87,7 +90,11 @@ class Product(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
-    
+    def save(self, *args, **kwargs):
+        """Override the save method to automatically generate a slug from the product name."""
+        if not self.slug:  # Check if the slug is empty
+            self.slug = slugify(self.name)  # Generate slug from the name
+        super().save(*args, **kwargs)  # Call the superclass save method
     def get_average_rating(self):
         """Calculates and returns the average rating for the product."""
         reviews = self.reviews.all()
@@ -139,6 +146,8 @@ class Review(models.Model):
     name = models.CharField(max_length=150, blank=True, null=True)
     rating = models.PositiveIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])  # Rating between 1 and 5
     review = models.TextField(blank=True, null=True)  # Optional review text
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f'{self.name} review for {self.product} - Rating: {self.rating}'

@@ -75,6 +75,15 @@ class ProductListByCategoryView(generics.ListAPIView):
 
         return queryset
     
+class ProductListByBrandView(generics.ListAPIView):
+    serializer_class = ProductSerializer
+    permission_classes = [AllowAny]
+    pagination_class = ProductPagination
+    def get_queryset(self):
+        brand_name = self.kwargs.get('brand_name').lower()
+        queryset = Product.objects.filter(brand__name__iexact=brand_name)
+        return queryset
+    
 class ProductListBySubCategoryView(generics.ListAPIView):
     serializer_class = ProductSerializer
     permission_classes = [AllowAny]

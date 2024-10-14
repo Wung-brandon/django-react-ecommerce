@@ -27,7 +27,12 @@ import {
     }
   
     return (
-      <Card sx={{ width: 280, height: 500, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+      <Card sx={{ width: 280, 
+                  height: 500, 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  justifyContent: 'space-between',
+                }}>
         <Box position="relative">
           <CardMedia 
             sx={{ height: 280 }}  // Fixed height for the image to ensure consistency
@@ -51,6 +56,7 @@ import {
                             flexDirection: 'column', 
                             justifyContent: 'space-between',
                             textAlign: 'center',
+                
                          }}>
           <Box sx={{ flexGrow: 1 }}>
             <Typography 

@@ -16,17 +16,30 @@ class ProductImageAdmin(admin.ModelAdmin):
     list_display = ['product', 'image']
     
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'brand', 'price', 'category', 'is_featured', 'is_new_arrival']
+    list_display = ['name', 'brand', 'price', 'category', 'is_featured', 'is_new_arrival', 'slug']
     list_editable = ['is_featured', 'is_new_arrival']
+    search_fields = ('name', 'brand__name', 'category__name')
+    prepopulated_fields = {
+        'slug': ('name',),
+    }
 
 class BrandAdmin(admin.ModelAdmin):
-    list_display = ['name']
+    list_display = ['name', 'slug']
+    prepopulated_fields = {
+        'slug': ('name',),
+    }
 
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['name', 'slug']
+    prepopulated_fields = {
+        'slug': ('name',),
+    }
     
 class SubCategoryAdmin(admin.ModelAdmin):
     list_display = ['name', 'category', 'slug']
+    prepopulated_fields = {
+        'slug': ('name',),
+    }
 
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ['name', 'product', 'rating']

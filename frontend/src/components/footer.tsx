@@ -1,5 +1,5 @@
 import { Box, Grid, Typography, Divider } from "@mui/material";
-import { WhatsApp, GitHub, LinkedIn } from "@mui/icons-material";
+import { WhatsApp, GitHub, LinkedIn} from "@mui/icons-material";
 import { Link } from "react-router-dom";
 
 function Footer() {
@@ -64,8 +64,8 @@ function Footer() {
             Quick Links
           </Typography>
           <Box component="ul" sx={{ listStyle: "none", padding: 0 }}>
-            {quickLinks.map((l) => (
-              <Typography component="li" padding='5px 0'>
+            {quickLinks.map((l, index) => (
+              <Typography component="li" padding='5px 0' key={index}>
                 <Link to={l.link} style={{ color: "#e8e9eb", textDecoration: "none" }}>
                   {l.name}
                 </Link>

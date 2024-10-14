@@ -6,7 +6,7 @@ const NavFooterLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
   return (
     <>
       <Navbar />
-      <div>{children}</div>
+        <div>{children}</div>
       <Footer />
     </>
   );

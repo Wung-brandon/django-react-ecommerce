@@ -19,19 +19,24 @@ import { useState, useEffect } from "react";
 import SearchBar from './SearchBar';
 import logoImg from '../../src/assets/logo11-removebg-preview.png';
 import { NavLink, Link } from "react-router-dom";
+import { useTheme } from "@mui/material/styles";
 
 function Navbar() {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [showSearchBar, setShowSearchBar] = useState(true); // Track the search bar visibility
   const [scrollPos, setScrollPos] = useState(0); // Track the scroll position
 
-  const StyledToolbar = styled(Toolbar)({
+  const theme = useTheme(); // Get the Material-UI theme object
+  const StyledToolbar = styled(Toolbar)(({ theme }) => ({
     display: 'flex',
+    justifyContent: 'space-between', // Space between logo and menu icon
     backgroundColor: '#550c18',
-    justifyContent: 'space-between',
     padding: '1.5em',
     transition: 'background-color 0.3s ease',
-  });
+    [theme.breakpoints.down('sm')]: {
+      padding: '1em', // Less padding on small screens
+    },
+  }));
 
   const Icons = styled(Box)(({ theme }) => ({
     display: "none",
@@ -76,7 +81,6 @@ function Navbar() {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollPos = window.pageYOffset;
-      console.log('scroll position: ', currentScrollPos)
       if (currentScrollPos > scrollPos || currentScrollPos > 100) {
         setShowSearchBar(false);  // Hide search bar when scrolling down
       } else {
@@ -93,53 +97,86 @@ function Navbar() {
   return (
     <AppBar position="sticky">
       <StyledToolbar>
-        {/* Brand Name */}
-        <img src={logoImg} className="img-fluid" width='130px' alt="Brand Logo" />
-
-        {/* Drawer for mobile */}
-        <IconButton 
-          edge="end" 
-          color="inherit" 
-          aria-label="menu" 
-          sx={{ display: { xs: "block", sm: "none" } }} 
-          onClick={() => setOpenDrawer(true)}
+        {/* Logo (Resized on small screens) */}
+        <Box 
+          display='flex' 
+          justifyContent='space-between' 
+          alignItems='center' 
+          sx={{
+            [theme.breakpoints.down('sm')]: {
+              width: '100%', // Smaller logo size for small screens
+            },
+          }}
+          
         >
-          <MenuIcon />
-        </IconButton>
+    {/* Logo: Adjusted for small screens */}
+      <img 
+        src={logoImg} 
+        alt="Brand Logo" 
+        className="img-fluid" 
+        style={{
+          width: '130px', // Default size
+          maxWidth: '100%', // Ensure responsiveness
+          height: 'auto', // Maintain aspect ratio
+          [theme.breakpoints.down('sm')]: {
+            width: '50px', // Smaller logo size for small screens
+          },
+        }}
+      />
+      {/* Drawer Icon for mobile view */}
+      <IconButton 
+        color="inherit" 
+        aria-label="menu" 
+        sx={{ display: { xs: "block", sm: "none" } }} 
+        onClick={() => setOpenDrawer(true)}
+      >
+        <MenuIcon sx={{ fontSize: '2rem' }} />
+      </IconButton>
+    </Box>
 
+
+        
         <Drawer
           anchor="right"
           open={openDrawer}
           onClose={() => setOpenDrawer(false)}
+          PaperProps={{
+            sx: { 
+              width: 250, 
+              backgroundColor: '#550c18',
+              color: 'white',
+              animation: openDrawer ? 'slideIn 0.3s' : 'slideOut 0.3s'
+            }
+          }}
         >
-          <Box sx={{ width: 250 }}>
-            <List>
-              {allLinks.map((text) => (
-                <ListItem button key={text.id}>
-                  <NavLink 
-                    to={text.link} 
-                    style={NavLinkStyled}
-                  >
-                    <Typography variant='h6'>{text.textLink}</Typography>
-                  </NavLink>
-                </ListItem>
-              ))}
-            </List>
-          </Box>
+          {/* List inside Drawer */}
+          <List>
+            {allLinks.map((item) => (
+              <ListItem button key={item.id} sx={{ justifyContent: 'center' }}>
+                <NavLink 
+                  to={item.link} 
+                  style={NavLinkStyled}
+                  onClick={() => setOpenDrawer(false)}  // Close drawer on link click
+                >
+                  <Typography variant='h6'>{item.textLink}</Typography>
+                </NavLink>
+              </ListItem>
+            ))}
+          </List>
         </Drawer>
 
         {/* Main navigation for larger screens */}
         <Box>
           <Box sx={{ display: { xs: 'none', sm: 'block' }, flex: 1 }}>
             <List sx={{ display: 'flex', cursor: 'pointer' }}>
-              {allLinks.map((text) => (
-                <ListItem button key={text.id} component='li'>
+              {allLinks.map((item) => (
+                <ListItem button key={item.id} component='li'>
                   <NavLink 
-                    to={text.link} 
+                    to={item.link} 
                     style={NavLinkStyled}
                     activeClassName="active"
                   >
-                    <Typography variant='h6'>{text.textLink}</Typography>
+                    <Typography variant='h6'>{item.textLink}</Typography>
                   </NavLink>
                 </ListItem>
               ))}

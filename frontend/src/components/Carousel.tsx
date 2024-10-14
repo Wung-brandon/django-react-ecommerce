@@ -1,5 +1,5 @@
 import Carousel from 'react-bootstrap/Carousel';
-import { Box, Typography, Button, ImageList, ImageListItem,ImageListItemBar } from '@mui/material';
+import { Box, Typography, Button, ImageList, ImageListItem, ImageListItemBar } from '@mui/material';
 import img1 from '../assets/womandress.jpg';
 import luxuryWatchImg from '../assets/luxarywatch.jpg';
 import arrivalImg from '../assets/2148312143 (1).jpg';
@@ -8,6 +8,7 @@ import collection1 from '../assets/women-collection-dresses.jpg'
 import collection2 from '../assets/pexels-shkrabaanthony-5264952.jpg'
 import collection3 from '../assets/istockphoto-1441098845-612x612.jpg'
 import collection4 from '../assets/watch-collection.jpg'
+
 // Sample images for New Arrivals
 const newArrivals = [
   { img: collection1, title: 'Women Collection' },
@@ -19,7 +20,13 @@ const newArrivals = [
 function EcommerceCarousel() {
   return (
     <Box sx={{ maxWidth: '100%', margin: '0 auto', position: 'relative' }}>
-      <Carousel controls={true} indicators={true} interval={null}> {/* Disable autoplay with interval={null} */}
+      <Carousel 
+        controls={true} 
+        indicators={true} 
+        interval={5000}  // Set auto-slide to 5 seconds
+        prevIcon={<span className="carousel-control-prev-icon custom-control" />}
+        nextIcon={<span className="carousel-control-next-icon custom-control" />}
+      >
         
         {/* Slide 1 */}
         <Carousel.Item>
@@ -113,24 +120,23 @@ function EcommerceCarousel() {
               <ImageList sx={{ width: '100%', height: 'auto' }} cols={4} gap={8}>
 
                 {newArrivals.map((item) => (
-                    <ImageListItem key={item.img} >
+                  <ImageListItem key={item.img}>
                     <img
-                        srcSet={`${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`}
-                        src={`${item.img}?w=248&fit=crop&auto=format`}
-                        alt={item.title}
-                        loading="lazy"
-                        className='img-fluid'
+                      srcSet={`${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`}
+                      src={`${item.img}?w=248&fit=crop&auto=format`}
+                      alt={item.title}
+                      loading="lazy"
+                      className='img-fluid'
                     />
                     <ImageListItemBar
-                        title={item.title}
-                        sx={{display:{xs:'none', sm:'block'}}}
+                      title={item.title}
+                      sx={{ display: { xs: 'none', sm: 'block' } }}
                     />
-                    </ImageListItem>
+                  </ImageListItem>
                 ))}
-                
+
               </ImageList>
 
-              
             </Box>
           </Box>
         </Carousel.Item>
@@ -163,7 +169,7 @@ function EcommerceCarousel() {
               <Typography variant="body1" sx={{ marginBottom: '20px' }}>
                 Get an exclusive 30% discount on all dresses. Hurry, shop now!
               </Typography>
-              <Button variant="contained" sx={{backgroundColor:'#f44336'}} size="large">
+              <Button variant="contained" sx={{ backgroundColor: '#f44336' }} size="large">
                 Buy Now
               </Button>
             </Box>
@@ -171,6 +177,22 @@ function EcommerceCarousel() {
         </Carousel.Item>
 
       </Carousel>
+
+      {/* Custom styles for carousel controls */}
+      <style>
+        {`
+          .custom-control {
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 50%;
+            padding: 20px;
+          }
+          .carousel-control-prev-icon,
+          .carousel-control-next-icon {
+            width: 30px;
+            height: 30px;
+          }
+        `}
+      </style>
     </Box>
   );
 }

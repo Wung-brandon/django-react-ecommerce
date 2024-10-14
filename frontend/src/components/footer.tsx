@@ -3,7 +3,37 @@ import { WhatsApp, GitHub, LinkedIn } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 
 function Footer() {
-  
+  const quickLinks = [
+    {name: 'Home', link: '/'},
+    {name: 'About Us', link: '/about'},
+    {name: 'Contact Us', link: '/contact'},
+    {name: 'Terms & Conditions', link: '/terms'},
+    {name: 'Privacy Policy', link: '/privacy'},
+    {name: 'Return Policy', link: '/return'},
+    {name: 'FAQs', link: '/faqs'},
+  ]
+
+  const socialMediaLinks = [
+    {icon: <WhatsApp fontSize="large"/>, link: 'https://wa.link/3ng2v5/'},
+    {icon: <GitHub fontSize="large"/>, link: 'https://github.com/Wung-brandon/'},
+    {icon: <LinkedIn fontSize="large"/>, link: 'https://www.linkedin.com/in/wung-brandon-000917256/'},
+  ]
+
+  const myAccountLinks = [
+    {name: 'Signup', link: '/signup'},
+    {name: 'Login', link: '/login'},
+    {name: 'Logout', link: '/logout'},
+    {name: 'My Orders', link: '/my-orders'},
+    {name: 'My Cart', link: '/my-cart'},
+    {name: 'My Wishlist', link: '/my-wishlist'},
+  ]
+
+  const shopLinks = [
+    {name: 'Men', link: '/shop/men'},
+    {name: 'Women', link: '/shop/women'},
+    {name: 'Children', link: '/shop/children'},
+    {name: 'Accessories', link: '/shop/accessories'},
+  ]
   return (
     <Box
       sx={{
@@ -14,7 +44,7 @@ function Footer() {
         marginTop: "auto",
       }}
     >
-      <Grid container spacing={3} justifyContent="center">
+      <Grid container spacing={3} justifyContent="center" >
         
         {/* About Us */}
         <Grid item xs={12} md={3}>
@@ -34,36 +64,14 @@ function Footer() {
             Quick Links
           </Typography>
           <Box component="ul" sx={{ listStyle: "none", padding: 0 }}>
-            <Typography component="li" padding='5px 0'>
-              <Link to="/" style={{ color: "#e8e9eb", textDecoration: "none" }}>
-                Home
-              </Link>
-            </Typography>
-            <Typography component="li" padding='5px 0'>
-              <Link to="/about" style={{ color: "#e8e9eb", textDecoration: "none" }}>
-                About Us
-              </Link>
-            </Typography>
-            <Typography component="li" padding='5px 0'>
-              <Link to="/about" style={{ color: "#e8e9eb", textDecoration: "none" }}>
-                Contact Us
-              </Link>
-            </Typography>
-            <Typography component="li" padding='5px 0'>
-              <Link to="/privacy" style={{ color: "#e8e9eb", textDecoration: "none" }}>
-                Privacy Policy
-              </Link>
-            </Typography>
-            <Typography component="li" padding='5px 0'>
-              <Link to="/terms" style={{ color: "#e8e9eb", textDecoration: "none" }}>
-                Terms & Conditions
-              </Link>
-            </Typography>
-            <Typography component="li">
-              <Link to="/faq" style={{ color: "#e8e9eb", textDecoration: "none" }}>
-                FAQ
-              </Link>
-            </Typography>
+            {quickLinks.map((l) => (
+              <Typography component="li" padding='5px 0'>
+                <Link to={l.link} style={{ color: "#e8e9eb", textDecoration: "none" }}>
+                  {l.name}
+                </Link>
+              </Typography>
+            ))}
+            
           </Box>
         </Grid>
 
@@ -72,31 +80,13 @@ function Footer() {
             My Account
           </Typography>
           <Box component="ul" sx={{ listStyle: "none", padding: 0 }}>
-            <Typography component="li" padding='5px 0'>
-              <Link to="/login" style={{ color: "#e8e9eb", textDecoration: "none" }}>
-                Login
-              </Link>
-            </Typography>
-            <Typography component="li" padding='5px 0'>
-              <Link to="/signup" style={{ color: "#e8e9eb", textDecoration: "none" }}>
-                Signup
-              </Link>
-            </Typography>
-            <Typography component="li" padding='5px 0'>
-              <Link to="/about" style={{ color: "#e8e9eb", textDecoration: "none" }}>
-                View Cart
-              </Link>
-            </Typography>
-            <Typography component="li" padding='5px 0'>
-              <Link to="/privacy" style={{ color: "#e8e9eb", textDecoration: "none" }}>
-                View Wishlist
-              </Link>
-            </Typography>
-            <Typography component="li" padding='5px 0'>
-              <Link to="/terms" style={{ color: "#e8e9eb", textDecoration: "none" }}>
-                Order History
-              </Link>
-            </Typography>
+            {myAccountLinks.map((l) => (
+              <Typography component="li" padding='5px 0'>
+                <Link to={l.link} style={{ color: "#e8e9eb", textDecoration: "none" }}>
+                  {l.name}
+                </Link>
+              </Typography>
+            ))}
           </Box>
         </Grid>
 
@@ -106,26 +96,13 @@ function Footer() {
             Shop
           </Typography>
           <Box component="ul" sx={{ listStyle: "none", padding: 0 }}>
-            <Typography component="li" padding='5px 0'>
-              <Link to="/shop/men" style={{ color: "#e8e9eb", textDecoration: "none" }}>
-                Men
-              </Link>
-            </Typography>
-            <Typography component="li" padding='5px 0'>
-              <Link to="/shop/women" style={{ color: "#e8e9eb", textDecoration: "none" }}>
-                Women
-              </Link>
-            </Typography>
-            <Typography component="li" padding='5px 0'>
-              <Link to="/shop/kids" style={{ color: "#e8e9eb", textDecoration: "none" }}>
-                Children
-              </Link>
-            </Typography>
-            <Typography component="li" padding='5px 0'>
-              <Link to="/shop/accessories" style={{ color: "#e8e9eb", textDecoration: "none" }}>
-              Accessories
-              </Link>
-            </Typography>
+            {shopLinks.map((l) => (
+              <Typography component="li" padding='5px 0'>
+                <Link to={l.link} style={{ color: "#e8e9eb", textDecoration: "none" }}>
+                  {l.name}
+                </Link>
+              </Typography>
+            ))}
           </Box>
         </Grid>
 
@@ -142,15 +119,11 @@ function Footer() {
           </Typography>
           <Box sx={{ mt: 2}}>
           <div className="col-lg-3 col-md-6 d-flex align-items-center justify-content-between mb-4">
-            <Link to="https://wa.link/3ng2v5/" target="_blank" rel="noopener noreferrer" className=" text-white">
-              <WhatsApp fontSize="large" />
-            </Link>
-            <Link to="https://github.com/Wung-brandon/" target="_blank" rel="noopener noreferrer" className="text-white">
-              <GitHub fontSize="large" />
-            </Link>
-            <Link to="https://www.linkedin.com/in/wung-brandon-000917256/" target="_blank" rel="noopener noreferrer" className="text-white">
-              <LinkedIn fontSize="large" />
-            </Link>
+            {socialMediaLinks.map((l) => (
+              <Link to={l.link} target="_blank" rel="noopener noreferrer" className=" text-white">
+                {l.icon}
+              </Link>
+            ))}
            </div>
           </Box>
         </Grid>

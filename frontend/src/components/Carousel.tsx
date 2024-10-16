@@ -3,7 +3,7 @@ import { Box, Typography, Button, ImageList, ImageListItem, ImageListItemBar } f
 import img1 from '../assets/womandress.jpg';
 import luxuryWatchImg from '../assets/luxarywatch.jpg';
 import arrivalImg from '../assets/2148312143 (1).jpg';
-import discountImg from '../assets/front-view.jpg';  // Add discount dress image
+import discountImg from '../assets/classy-modern-suit-black-using-stylish.jpg';  // Add discount dress image
 import collection1 from '../assets/women-collection-dresses.jpg'
 import collection2 from '../assets/pexels-shkrabaanthony-5264952.jpg'
 import collection3 from '../assets/istockphoto-1441098845-612x612.jpg'
@@ -169,7 +169,7 @@ function EcommerceCarousel() {
               <Typography variant="body1" sx={{ marginBottom: '20px' }}>
                 Get an exclusive 30% discount on all dresses. Hurry, shop now!
               </Typography>
-              <Button variant="contained" sx={{ backgroundColor: '#f44336' }} size="large">
+              <Button variant="contained" sx={{ backgroundColor: '#080808' }} size="large">
                 Buy Now
               </Button>
             </Box>

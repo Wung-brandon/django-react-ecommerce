@@ -5,7 +5,7 @@ import { Search } from '@mui/icons-material';
 // Define the props interface
 interface SearchBarProps {
   placeholder: string;
-  onSearch: (query: string) => void;
+  onSearch?: (query: string) => void;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ placeholder, onSearch }) => {

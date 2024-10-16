@@ -1,9 +1,10 @@
 import { ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
-import Navbar from './components/navbar';
-import Footer from './components/footer';
 import NavFooterLayout from './Layout/NavFooter.layout';
-import { HomePage } from './Pages';
+import { 
+          HomePage,
+          ProductDetails
+      } from './Pages';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
       <NavFooterLayout>
         <Routes>
           <Route exact path="/" element={<HomePage />} />
+          <Route path="/products/:slug" element={<ProductDetails />} />
           {/* <Route path="/products" element={<Products />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />

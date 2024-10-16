@@ -6,7 +6,8 @@ import {
 
 interface ButtonProp{
     text: string;  // required prop to define the text content of the heading.  The text content will be displayed as a heading (h4).  The color and font weight will be set as per the provided prop values.  The textAlign prop will be set to 'center' to center align the heading.  The sx prop is used to apply CSS styles.  The variant prop is set to 'h4' to define the size and style of the heading.  The text content will be displayed in the color #550c18 and font weight will be bold.  The heading will be centered.  The sx prop is used to apply CSS styles.  The variant prop is set to 'h4' to define the size and style of the heading.  The text content will be displayed in the color #550c18 and font weight will be bold.  The heading will be centered.  The sx prop is used to apply CSS styles
-    onClick?: any
+    onClick?: any;
+    sx?: any; // optional
 }
 
 const ButtonComponent:React.FC<ButtonProp> = ({text, onClick}) => {
@@ -19,6 +20,7 @@ const ButtonComponent:React.FC<ButtonProp> = ({text, onClick}) => {
                 size="large"
                 startIcon={<ShoppingCart />}
                 onClick={onClick}
+                
             >{text}</Button>
         </>
     )

@@ -93,6 +93,7 @@ const ProductSection = ({ heading, apiUrl }: ProductSectionProps) => {
                 style={{ padding: '0.75rem'}}
               >
                 <ProductCard
+                  id={product.id}
                   name={product.name}
                   price={`${product.price} CFA`}
                   image={product.image || discountImg}
@@ -106,6 +107,7 @@ const ProductSection = ({ heading, apiUrl }: ProductSectionProps) => {
                     />
                   }
                   slug={product.slug}  // Ensure you are passing slug here
+                  
                 />
               </Col>
             ))}

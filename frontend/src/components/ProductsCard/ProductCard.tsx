@@ -5,16 +5,15 @@ import {
   CardContent, 
   CardMedia, 
   Typography,
-  IconButton,
-  Checkbox
 } from "@mui/material";
-import { Favorite, FavoriteBorder } from "@mui/icons-material";
+import { ShoppingCart  } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 import './productCard.css';
 import ButtonComponent from "../Button.component";
 import { ProductProps } from "../Types/productTypes";
+import FavoritesButt from "../FavoritesButt";
 
-const ProductCard: React.FC<ProductProps> = ({ name, price, image, review_count, average_rating, slug }) => {
+const ProductCard: React.FC<ProductProps> = ({ name, price, image, review_count, average_rating, id, slug }) => {
   function handleAlert() {
     alert("Product added to cart successfully");
   }
@@ -31,7 +30,7 @@ const ProductCard: React.FC<ProductProps> = ({ name, price, image, review_count,
       }}
     >
       <Box position="relative">
-        <Link to={`/products/${slug}`}>
+        <Link to={`/products/${id}`}>
           <CardMedia 
             sx={{ 
               height: { xs: 380, sm: 400 },  // Adjust the image height for small screens
@@ -42,22 +41,13 @@ const ProductCard: React.FC<ProductProps> = ({ name, price, image, review_count,
             className="img-fluid card-img"
           />
           </Link>
-        <IconButton 
-          aria-label="add to favorites" 
-          sx={{ 
-            position: 'absolute', 
-            top: 5, 
-            right: 5 
-          }}
-        >
-          <Checkbox 
-            icon={<FavoriteBorder sx={{ color: '#b0b0b0' }} />} 
-            color="error" 
-            size="large" 
-            checkedIcon={<Favorite />} 
-          />
-        </IconButton>
-
+        <FavoritesButt sx={{ 
+              position: 'absolute', 
+              top: 5, 
+              right: 5 
+            }} 
+        /> 
+        
       </Box>
       <CardContent 
         sx={{ 
@@ -80,7 +70,7 @@ const ProductCard: React.FC<ProductProps> = ({ name, price, image, review_count,
               whiteSpace: 'nowrap',
             }}
           >
-            <Link to={`/products/${slug}`} style={{textDecoration: 'none'}} className="link">
+            <Link to={`/products/${id}`} style={{textDecoration: 'none'}} className="link">
                 {name}
             </Link>
           </Typography>
@@ -113,6 +103,8 @@ const ProductCard: React.FC<ProductProps> = ({ name, price, image, review_count,
         <ButtonComponent 
           text="Add to Cart" 
           onClick={handleAlert} 
+          color='#550c18'
+          icon={<ShoppingCart />}
           sx={{ 
             width: { xs: '100%', sm: 'auto' },  // Full width button on small screens
             padding: { xs: '8px', sm: '10px 20px' }  // Adjust padding for small screens

@@ -1,89 +1,101 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// import { useEffect, useState } from 'react';
-// import { useParams } from 'react-router-dom';
-// import axios from 'axios';
-
-// const ProductDetails = () => {
-//   const { slug } = useParams<{ slug: string }>();  // Extract slug from the URL
-//   const [product, setProduct] = useState<any>(null);
-
-//   useEffect(() => {
-//     // Fetch product details based on the slug
-//     axios.get(`${import.meta.env.VITE_API_PRODUCT_BASE_URL}/${slug}/`)
-//       .then((response) => {
-//         console.log('slug name', response.data.results);
-//         setProduct(response.data.results);
-//       })
-//       .catch((error) => {
-//         console.error('Error fetching product data:', error);
-//       });
-//   }, [slug]);
-
-//   if (!product) {
-//     return <div>Loading...</div>;
-//   }
-
-//   return (
-//     <div>
-//       <h1>{product.name}</h1>
-//       <img src={product.image} alt={product.name} />
-//       <p>{product.description}</p>
-//       <p>Price: {product.price}</p>
-//       <p>Average Rating: {product.average_rating}</p>
-//     </div>
-//   );
-// };
-
-// export default ProductDetails;
-
-
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Box, Stack } from '@mui/material';
+import { ProductProps } from '../../components/Types/productTypes';
+import ProductData from '../../components/ProductDetails/productData';
+import ProductImage from '../../components/ProductDetails/productImage';
+import ProductTabs from '../../components/ProductDetails/productTab';
+import ProductSection from '../../components/productSection';
 
+const ProductDetails:React.FC<ProductProps> = () => {
+  const { id } = useParams<{ id: string }>();
+  const [product, setProduct] = useState<ProductProps>();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-interface productTypes{
-  name: string;
-}
-const ProductDetails:React.FC= () => {
-  const { id } = useParams<{ id: string }>(); // Make sure 'id' or 'slug' matches your route
-  const [product, setProduct] = useState<productTypes>( );
-  const navigate = useNavigate();
+  const apiUrl = import.meta.env.VITE_API_PRODUCT_BASE_URL
 
   useEffect(() => {
-    if (!id) {
-      console.error("Product ID or slug is missing in URL");
-      return;
-    }
+    const fetchProduct = async () => {
+      if (!id || id === 'undefined') {
+        setError("Product ID is missing or invalid");
+        setLoading(false);
+        return;
+      }
 
-    axios.get(`${import.meta.env.VITE_API_PRODUCT_BASE_URL}${id}/`)
-      .then(response => {
-        const productData = response.data;
-        setProduct(productData);
+      try {
+        const response = await axios.get(`${apiUrl}/${id}/`);
+        console.log('product details', response.data)
+        setProduct(response.data);
+      } catch (error) {
+        console.error('Error fetching product data:', error);
+        setError('Error fetching product data');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-        // If the current 'id' is a number and not the slug, update the URL to show the slug
-        if (id !== productData.slug) {
-          navigate(`/products/${productData.slug}`, { replace: true });
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching product data:', error.response ? error.response.data : error.message);
-      });
-  }, [id, navigate]);
+    fetchProduct();
+  }, [id]);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
+  if (!product) return <div>Product not found.</div>;
+
+  
 
   return (
-    <div>
-      {product ? (
-        <div>
-          <h1>{product.name}</h1>
-          {/* Other product details here */}
-        </div>
-      ) : (
-        <p>Loading...</p>
-      )}
-    </div>
+    <Box padding='1.5rem'>
+      <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" spacing={2}>
+        {/* Pass image URLs instead of JSX elements */}
+        <ProductImage 
+          image={product.image}
+          images={product.images ? product.images.map((img: any) => img.image) : []}
+        />
+    
+        {/* Product data */}
+        <ProductData />
+      </Stack>
+  
+      {/* Display more product details as needed */}
+      <Box padding='1rem'>
+        <ProductTabs />
+      </Box>
+
+      {/* Render Related Products */}
+      <ProductSection 
+        heading="Related Products" 
+        apiUrl={`${apiUrl}/${id}/related/`} 
+      />
+
+      {/* <h1>{product.name}</h1>
+  
+  
+  <img src={product.image} alt={product.name} width="150px" />
+  
+  
+  {product.images && product.images.map((img:any) => (
+    <img key={img.id} src={img.image} alt={product.name} width="150px" />
+  ))}
+  
+  <p>{product.description}</p>
+  <p>Price: CFA{product.price}</p>
+  <p>Brand: {product.brand}</p>
+  <p>Average Rating: {product.average_rating}</p>
+  
+ 
+  <p>Available Sizes:</p>
+  <ul>
+    {product.available_sizes && product.available_sizes.map((size:any) => (
+      <li key={size}>{size}</li>
+    ))}
+  </ul> */}
+    </Box>
   );
 };
 
 export default ProductDetails;
+
+

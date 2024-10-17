@@ -16,7 +16,7 @@ function App() {
       <NavFooterLayout>
         <Routes>
           <Route exact path="/" element={<HomePage />} />
-          <Route path="/products/:slug" element={<ProductDetails />} />
+          <Route path="/products/:id" element={<ProductDetails />} />
           {/* <Route path="/products" element={<Products />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />

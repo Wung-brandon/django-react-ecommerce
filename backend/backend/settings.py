@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import environ
+from django.utils.translation import gettext_lazy as _
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -53,21 +55,50 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt.token_blacklist",
 ]
 
+USE_I18N = True          # use internationalization
+USE_L10N = True          # use localization
+USE_TZ = True
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.common.CommonMiddleware",
     "corsheaders.middleware.CorsMiddleware",
+    'django.middleware.locale.LocaleMiddleware',
+    "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+LANGUAGE_CODE = 'en-us'  # default (fallback) language
+# Add the supported languages
+LANGUAGES = [
+    ('en', _('English')),
+    ('fr', _('French')),
+    # Add other languages here
+]
+
+# Define the directory where translation files will be stored
+LOCALE_PATHS = [
+    BASE_DIR / 'locale/',
+]
+
+# Specify which files and directories to exclude from makemessages
+gettext_exclude = [
+    'requirements.txt',
+    '*.json',
+    '*.md',
+    'node_modules',
+    'env',  # Exclude virtual environment folder
+    'static',  # Exclude static files
+]
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173"
 ]
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = "backend.urls"
 

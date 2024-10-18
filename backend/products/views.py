@@ -10,6 +10,11 @@ from .filters import ProductFilter
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .pagination import ProductPagination
+from rest_framework.exceptions import NotFound
+from django.db.models import Q
+from django.utils.translation import gettext_lazy as _
+import logging
+from django.http import Http404
 from .models import (
     Product,
     Category,
@@ -37,7 +42,7 @@ from .serializers import (
     WishlistItemSerializer,
 
 )
-
+from django.utils import translation
 
 # Get all products with related products
 class ProductListView(generics.ListAPIView):
@@ -46,14 +51,47 @@ class ProductListView(generics.ListAPIView):
     serializer_class = ProductSerializer
     permission_classes = [AllowAny]
     filterset_class = ProductFilter
-    # filterset_fields = ['category', 'brand', 'price', 'subcategory__name',]
     search_fields = ['name', 'description', 'category__name', 'brand__name', 'subcategory__name']
     ordering_fields = ['id', 'price', 'name']
     pagination_class = ProductPagination
-    page_size = 10
     parser_classes = [FormParser, MultiPartParser]
+
+    # def get(self, request, *args, **kwargs):
+    #     # Check for 'lang' query parameter to switch languages
+    #     language = request.query_params.get('lang', None)
+    #     if language:
+    #         translation.activate(language)  # Activate selected language (e.g., 'fr' for French)
+    #     response = super().get(request, *args, **kwargs)
+    #     translation.deactivate()  # Deactivate language after response
+    #     return response
+
     def perform_create(self, serializer):
         serializer.save()
+        
+class ProductRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = ProductSerializer
+    permission_classes = [AllowAny]
+    queryset = Product.objects.all()
+    # Override get_object to retrieve by either slug or id
+    
+    def get_object(self):
+        queryset = self.get_queryset()
+        lookup_value = self.kwargs.get('lookup_value')  # Should match your URL pattern
+        
+        if not lookup_value:
+            raise NotFound("Product not found.")
+
+        # Check if the lookup_value is numeric (for ID), else treat it as slug
+        if lookup_value.isdigit():
+            try:
+                return queryset.get(id=lookup_value)
+            except Product.DoesNotExist:
+                raise NotFound("Product with the specified ID not found.")
+        else:
+            try:
+                return queryset.get(slug=lookup_value)
+            except Product.DoesNotExist:
+                raise NotFound("Product with the specified slug not found.")
         
 class ProductListByCategoryView(generics.ListAPIView):
     serializer_class = ProductSerializer
@@ -93,12 +131,24 @@ class ProductListBySubCategoryView(generics.ListAPIView):
         subcategory_name = self.kwargs.get('subcategory_name').lower()
         return Product.objects.filter(subcategory__name__iexact=subcategory_name)
 
-
+logger = logging.getLogger(__name__)
 class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     permission_classes = [AllowAny]
     serializer_class = ProductSerializer
+    lookup_field = 'pk'
     parser_classes = (MultiPartParser, FormParser,)
+    
+    # def get_object(self):
+    #     pk = self.kwargs['pk']
+    #     logger.debug(f"Fetching product with pk: {pk}")
+    #     try:
+    #         if pk.isdigit():
+    #             return self.queryset.get(id=pk)
+    #         return self.queryset.get(slug=pk)
+    #     except Product.DoesNotExist:
+    #         logger.error(f"Product not found for pk: {pk}")
+    #         raise Http404("Product not found")
     
 class CategoryListView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
@@ -162,7 +212,7 @@ class ReviewListCreateView(generics.ListCreateAPIView):
     pagination_class = ProductPagination
     permission_classes = [AllowAny]
     serializer_class = ReviewSerializer
-    queryset = Review.objects.all()
+    queryset = Review.objects.all().order_by('-id')
 
     def get_queryset(self):
          return Review.objects.filter(product_id=self.kwargs["product_id"])
@@ -196,12 +246,14 @@ class TopRatedProductsView(generics.ListAPIView):
     permission_classes = [AllowAny]
     serializer_class = ProductSerializer
 
+    def get(self, request, *args, **kwargs):
+        logger.debug("Fetching top-rated products")
+        return super().get(request, *args, **kwargs)
     def get_queryset(self):
-        # Annotate products with average rating and order by it
+        # Annotate products with average rating and filter for products with a rating of 4 or 5
         return Product.objects.annotate(
             average_rating=models.Avg('reviews__rating')
-        ).filter(reviews__isnull=False).order_by('-average_rating')[:10]  # Limit top 10 products
-
+        ).filter(Q(average_rating__gte=4.0) & Q(average_rating__lte=5.0)).order_by('-average_rating')  # Filter only products with average rating of 5 and 4
 # View for Best-Selling Products
 class BestSellingProductsView(generics.ListAPIView):
     pagination_class = ProductPagination

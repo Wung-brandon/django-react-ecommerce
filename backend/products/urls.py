@@ -1,7 +1,8 @@
-from django.urls import path
+from django.urls import path, re_path
 from .views import (
     ProductListView,
     ProductDetailView,
+    ProductRetrieveUpdateDestroyView,
     FeaturedProductListView,
     NewArrivalProductListView,
     RecentProductListView,
@@ -39,7 +40,9 @@ from .views import (
 
 urlpatterns = [
     path('', ProductListView.as_view(), name='products'),
+    # path('<lookup_value>/', ProductRetrieveUpdateDestroyView.as_view(), name='product-detail'),  # One endpoint for both
     path('<int:pk>/', ProductDetailView.as_view(), name='product-detail'),
+    # re_path(r'^(?P<pk>[\w-]+)/$', ProductDetailView.as_view(), name='product-detail'),
     path('featured/',FeaturedProductListView.as_view(), name='featured'),
     path('<int:product_id>/related/',RelatedProductListView.as_view(), name='related'),
     path('top-rated/', TopRatedProductsView.as_view(), name='top-rated-products'),

@@ -49,11 +49,13 @@ class ProductSerializer(serializers.ModelSerializer):
     subcategory = serializers.StringRelatedField(allow_null=True)  # Optional subcategory
     review_count = serializers.SerializerMethodField()
     average_rating = serializers.SerializerMethodField()
+    rating_percentages = serializers.SerializerMethodField()
+    available_sizes = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
         fields = ['id', 'name', 'description', 'brand', 'category', 'subcategory', 'price', 'stock', 
-                  'image', 'video', 'is_featured', 'is_new_arrival', 'slug', 
+                  'image', 'video', 'is_featured', 'is_new_arrival', 'slug', 'available_sizes', 'rating_percentages',
                   'images', 'additional_images', 'review_count', 'average_rating', 'sales_count']
         read_only_fields = ['id', 'is_featured', 'is_new_arrival']
 
@@ -82,6 +84,13 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_average_rating(self, obj):
         average_rating = obj.get_average_rating()
         return round(average_rating, 1) if average_rating else None
+    
+    def get_rating_percentages(self, obj):
+        return obj.get_rating_percentages()
+    
+    def get_available_sizes(self, obj):
+        # Return a list of available sizes from the DEFAULT_SIZES
+        return [size[0] for size in Product.DEFAULT_SIZES]
 
     # def get_related_products(self, obj):
     #     related_products = obj.get_related_products()
@@ -89,13 +98,13 @@ class ProductSerializer(serializers.ModelSerializer):
     #     return RelatedProductSerializer(related_products, many=True).data
 
 
-# # Create a smaller serializer for related products to avoid recursion
+# Create a smaller serializer for related products to avoid recursion
 # class RelatedProductSerializer(serializers.ModelSerializer):
 #     images = ProductImageSerializer(many=True, read_only=True)
 #     class Meta:
 #         model = Product
 #         fields = ['id', 'name', 'price', 'slug', 'image', 'images', 'description', 'category', 'subcategory', 
-#                     'stock', 'brand', 'review_count', 'average_rating', 'sales_count']  # Only include essential fields
+#                     'stock', 'brand',]  # Only include essential fields
     
 
 # # Serializer for Featured Products

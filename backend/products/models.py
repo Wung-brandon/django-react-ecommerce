@@ -4,15 +4,15 @@ from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils import timezone
 from datetime import timedelta, datetime
-
+from django.utils.translation import gettext_lazy as _
 
 
 class Category(models.Model):
     Categories = (
-        ('MEN', 'Men'),
-        ('WOMEN', 'Women'),
-        ('CHILDREN', 'Children'),
-        ('ACCESSORIES', 'Accessories')
+        ('MEN', _('Men')),
+        ('WOMEN', _('Women')),
+        ('CHILDREN', _('Children')),
+        ('ACCESSORIES', _('Accessories'))
         
     )
     name = models.CharField(max_length=100, choices=Categories, default='MEN')
@@ -27,7 +27,7 @@ class Category(models.Model):
         return self.name
     
     class Meta:
-        verbose_name_plural = 'Categories'
+        verbose_name_plural = _('Categories')
 
 
 # SubCategory model for specific categories like T-shirts, Trousers, etc.
@@ -45,7 +45,7 @@ class SubCategory(models.Model):
         return self.name
     
     class Meta:
-        verbose_name_plural = 'Subcategories'
+        verbose_name_plural = _('Subcategories')
     
 
 class Brand(models.Model):
@@ -61,7 +61,7 @@ class Brand(models.Model):
         return self.name
     
     class Meta:
-        verbose_name_plural = 'Brand'
+        verbose_name_plural = _('Brands')
 
 class Product(models.Model):
     DEFAULT_SIZES = (
@@ -102,6 +102,21 @@ class Product(models.Model):
             return reviews.aggregate(average=models.Avg('rating'))['average']
         return None
 
+    def get_rating_percentages(self):
+        """Calculates the percentage of each star rating (1 to 5 stars)."""
+        reviews = self.reviews.all()
+        total_reviews = reviews.count()
+
+        # Initialize a dictionary to store the percentage for each star rating
+        star_percentages = {star: 0 for star in range(1, 6)}
+
+        if total_reviews > 0:
+            # Calculate the count of each star rating
+            for star in range(1, 6):
+                count = reviews.filter(rating=star).count()
+                star_percentages[star] = round((count / total_reviews) * 100, 2)
+
+        return star_percentages
     
     def get_review_count(self):
         """Returns the total number of reviews for the product."""
@@ -129,7 +144,8 @@ class Product(models.Model):
     def get_related_products(self):
         """Fetch related products based on the category or brand."""
         return Product.objects.filter(category=self.category).exclude(id=self.id)[:4]
-
+    class Meta:
+        verbose_name_plural = _('Products')
 # Product Image Model
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
@@ -151,6 +167,9 @@ class Review(models.Model):
 
     def __str__(self):
         return f'{self.name} review for {self.product} - Rating: {self.rating}'
+    
+    class Meta:
+        verbose_name_plural = _('Review')
 
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='carts', null=True, blank=True)
@@ -175,8 +194,6 @@ class Cart(models.Model):
     def total_items_count(self):
         """Get total count of unique items in the cart."""
         return self.items.count()  # Count of unique CartItems
-    
-        
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
@@ -192,6 +209,9 @@ class CartItem(models.Model):
     def total_price(self):
         """Calculate total price for this cart item based on the quantity"""
         return self.quantity * self.product.price
+    
+    class Meta:
+        verbose_name_plural = _('Cart Items')
 
 # Wishlist model to store wishlist related to a user
 class Wishlist(models.Model):
@@ -205,6 +225,8 @@ class Wishlist(models.Model):
     def total_items(self):
         """Get total count of items in the wishlist."""
         return self.wishlist_items.count()
+    class Meta:
+        verbose_name_plural = _('Wishlist')
 
 # WishlistItem model to store individual items in the wishlist
 class WishlistItem(models.Model):
@@ -214,6 +236,7 @@ class WishlistItem(models.Model):
 
     class Meta:
         unique_together = ('wishlist', 'product')  # Ensure that the same product is not added twice
+        verbose_name_plural = _('Wishlist Items')
 
     def __str__(self):
         return f"{self.product.name} (Wishlist: {self.wishlist.id})"

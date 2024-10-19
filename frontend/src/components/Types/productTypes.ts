@@ -14,6 +14,7 @@ export interface ProductProps {
     subcategory?: string;
     stock?: string | number;
     available_sizes?: any | string[];
+    rating_percentages?: any 
 
   }
 

@@ -81,16 +81,30 @@ const ProductImage: React.FC<ImagesProps> = ({ images = [], image }) => {
 
   return (
     <Box flex={2} sx={{ position: 'relative', overflow: 'hidden' }}>
-      <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
+      <Stack direction={{ xs: 'column', md: 'row',  }} spacing={2}>
         {/* Display product thumbnails */}
-        <Stack direction="column" spacing={2} sx={{ cursor: 'pointer' }}>
+        <Stack 
+            direction={{xs: 'row', md: 'column',}} 
+            spacing={2} 
+            sx={{ cursor: 'pointer',
+                  width: { xs: '100%', md: '20%' },
+                  paddingBottom: { xs: '1rem', md: 0 },
+                  
+                  justifyContent: { xs: 'center', md: 'flex-start' },
+         }}>
           {images.map((img, index) => (
             <img
               key={index}
               src={img}
               alt="product thumbnail"
-              width="150px"
-              style={{ maxWidth: '100%', border: img === mainImage ? '2px solid teal' : 'none' }}
+              style={{
+                width: '70px',
+                height: '70px',
+                objectFit: 'cover',
+                borderRadius: '4px',
+                border: img === mainImage ? '2px solid teal' : 'none',
+                margin: '0.5rem',
+              }}
               onClick={() => handleThumbnailClick(img)} // Set clicked image as main image
             />
           ))}
@@ -104,8 +118,9 @@ const ProductImage: React.FC<ImagesProps> = ({ images = [], image }) => {
             paddingLeft: { md: '3rem', xs: '0' },
             marginBottom: { xs: '1rem', md: '0' },
             overflow: 'hidden', // Ensure the image is constrained to the box
-            width: '80%', // Set a fixed width for the container
-            height: 'auto',
+            display:{xs:{justifyContent: 'center'}},
+            width: { xs: '100%', md: '80%' },
+            height: { xs: 'auto', md: '500px' },
           }}
           onMouseMove={handleMouseMove}
           onMouseDown={handleMouseDown}

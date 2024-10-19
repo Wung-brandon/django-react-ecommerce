@@ -25,7 +25,7 @@ import LanguageSelect from "./LanguageSelect";
 import { useState, useEffect } from "react";
 import SearchBar from './SearchBar';
 import logoImg from '../../src/assets/logo11-removebg-preview.png';
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
 
 function Navbar() {
@@ -38,6 +38,7 @@ function Navbar() {
   const [anchorElAccessories, setAnchorElAccessories] = useState<null | HTMLElement>(null);
 
   const theme = useTheme();
+  const navigate = useNavigate();
 
   const StyledToolbar = styled(Toolbar)(({ theme }) => ({
     display: 'flex',
@@ -125,13 +126,16 @@ function Navbar() {
             src={logoImg} 
             alt="Brand Logo" 
             className="img-fluid" 
+            onClick={() => navigate('/')}
             style={{
               width: '130px', // Default size
               maxWidth: '100%', // Ensure responsiveness
               height: 'auto', // Maintain aspect ratio
               [theme.breakpoints.down('sm')]: {
                 width: '50px', // Smaller logo size for small screens
+                
               },
+              cursor:'pointer'
             }}
           />
           <IconButton color="inherit" aria-label="menu" sx={{ display: { xs: "block", sm: "none" } }} onClick={() => setOpenDrawer(true)}>

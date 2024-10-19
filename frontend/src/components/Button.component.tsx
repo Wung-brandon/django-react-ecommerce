@@ -15,7 +15,6 @@ const ButtonComponent:React.FC<ButtonProp> = ({text, onClick, color, icon}) => {
             <Button 
                 variant="contained" 
                 sx={{backgroundColor: color}} 
-                fullWidth
                 size="large"
                 startIcon={icon}
                 onClick={onClick}

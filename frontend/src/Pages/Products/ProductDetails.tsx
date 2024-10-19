@@ -48,7 +48,7 @@ const ProductDetails:React.FC<ProductProps> = () => {
 
   return (
     <Box padding='1.5rem'>
-      <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" spacing={2}>
+      <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-evenly" spacing={2}>
         {/* Pass image URLs instead of JSX elements */}
         <ProductImage 
           image={product.image}
